@@ -1,0 +1,12 @@
+package com.zalmoxis2d.desktop;
+
+import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
+import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
+import com.zalmoxis2d.Zalmoxis2D;
+
+public class DesktopLauncher {
+	public static void main (String[] arg) {
+		LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
+		new LwjglApplication(new Zalmoxis2D(), config);
+	}
+}
