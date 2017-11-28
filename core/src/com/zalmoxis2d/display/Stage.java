@@ -23,13 +23,21 @@ public class Stage implements Screen, InputProcessor {
         // Private constructor
     }
 
-    public void init(DisplayObject mainDisplayObject) {
-        this.mainDisplayObject = mainDisplayObject;
+    public void init() {
+        this.mainDisplayObject = new DisplayObject();
         this.spriteBatch = new SpriteBatch();
     }
 
     public static Stage getInstance() {
         return INSTANCE;
+    }
+
+    public void addChild(DisplayObject displayObject) {
+        this.mainDisplayObject.addChild(displayObject);
+    }
+
+    public void removeChild(DisplayObject displayObject) {
+        this.mainDisplayObject.removeChild(displayObject, true);
     }
 
     public void render() {

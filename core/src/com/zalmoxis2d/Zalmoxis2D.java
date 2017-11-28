@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.zalmoxis2d.display.DisplayObject;
 import com.zalmoxis2d.display.Stage;
+import com.zalmoxis2d.text.TextField;
 
 public class Zalmoxis2D extends ApplicationAdapter {
 	SpriteBatch batch;
@@ -24,7 +25,7 @@ public class Zalmoxis2D extends ApplicationAdapter {
 		displayObject = new DisplayObject();
 		displayObject.setSprite(new Sprite(img));
 
-		this.stage.init(displayObject);
+		this.stage.init();
 
 		DisplayObject test = new DisplayObject();
 		test.setSprite(new Sprite(img));
@@ -33,6 +34,15 @@ public class Zalmoxis2D extends ApplicationAdapter {
 		test.setAlpha(0.1f);
 
 		displayObject.addChild(test);
+		displayObject.setX(150);
+
+		stage.addChild(displayObject);
+
+		TextField textField = new TextField("Test Text");
+		stage.addChild(textField);
+
+		System.out.println("Text dimensions: " + textField.getWidth() + " -- " + textField.getHeight());
+		System.out.println("DO dimensions: " + displayObject.getWidth() + " -- " + displayObject.getHeight());
 	}
 
 	@Override

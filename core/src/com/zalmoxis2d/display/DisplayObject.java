@@ -2,32 +2,33 @@ package com.zalmoxis2d.display;
 
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.math.collision.BoundingBox;
 import com.zalmoxis2d.event.EventDispatcher;
-
 import java.util.ArrayList;
 import java.util.List;
 
 public class DisplayObject extends EventDispatcher {
+    protected Vector2 globalCoordinates = new Vector2(0, 0);
+    protected BoundingBox boundingBox = null;
+
     private Vector2 coordinates = new Vector2(0, 0);
-    private Vector2 globalCoordinates = new Vector2(0, 0);
     private DisplayObject parent = null;
     private List<DisplayObject> children = new ArrayList<>();
     private Sprite sprite = null;
     private float alpha = 1;
-    private float width = 0;
-    private float height = 0;
 
     public void setSprite(Sprite sprite) {
         this.sprite = sprite;
-        calculateDimensions();
     }
 
     public void addChild(DisplayObject child) {
         this.children.add(0, child);
         child.parent = this;
         child.calculateGlobalCoordinates();
-        calculateDimensions();
+        this.boundingBox = null;
     }
 
     public boolean removeChild(DisplayObject child) {
@@ -40,7 +41,7 @@ public class DisplayObject extends EventDispatcher {
         if (dispose && removed) {
             child.dispose();
         }
-        calculateDimensions();
+        this.boundingBox = null;
         return removed;
     }
 
@@ -63,11 +64,17 @@ public class DisplayObject extends EventDispatcher {
     }
 
     public float getWidth() {
-        return this.width;
+        if (boundingBox == null) {
+            calculateBoundingBox();
+        }
+        return this.boundingBox.getWidth();
     }
 
     public float getHeight() {
-        return this.height;
+        if (boundingBox == null) {
+            calculateBoundingBox();
+        }
+        return boundingBox.getHeight();
     }
 
     public void setAlpha(float alpha) {
@@ -116,6 +123,7 @@ public class DisplayObject extends EventDispatcher {
 
     protected void calculateGlobalCoordinates() {
         if (this.parent == null) return;
+
         this.globalCoordinates.x = this.coordinates.x + this.parent.globalCoordinates.x;
         this.globalCoordinates.y = this.coordinates.y + this.parent.globalCoordinates.y;
 
@@ -123,16 +131,29 @@ public class DisplayObject extends EventDispatcher {
             this.sprite.setX(this.globalCoordinates.x);
             this.sprite.setY(this.globalCoordinates.y);
         }
+
+        for (DisplayObject child:this.children) {
+            child.calculateGlobalCoordinates();
+        }
     }
 
-    protected void calculateDimensions() {
-        float tmpWidth = 0;
-        float tmpHeight = 0;
+    public BoundingBox getBounds() {
+        if (boundingBox == null) {
+            calculateBoundingBox();
+        }
+        return this.boundingBox;
+    }
+
+    protected void calculateBoundingBox() {
+        this.boundingBox = new BoundingBox();
         if (this.sprite != null) {
-            tmpWidth += this.sprite.getWidth();
-            tmpHeight += this.sprite.getHeight();
+            Rectangle rectangle = this.sprite.getBoundingRectangle();
+            BoundingBox spriteBB = new BoundingBox(new Vector3(rectangle.x, rectangle.y, 0), new Vector3(rectangle.width, rectangle.height, 0));
+            this.boundingBox.ext(spriteBB);
         }
 
-        // TODO: Calculate width and height using children as well
+        for (DisplayObject child:this.children) {
+            this.boundingBox.ext(child.getBounds());
+        }
     }
 }
