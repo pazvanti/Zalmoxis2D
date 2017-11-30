@@ -32,9 +32,11 @@ public class Zalmoxis2D extends ApplicationAdapter {
 		test.setX(400);
 		test.setY(100);
 		test.setAlpha(0.1f);
+		test.setRotation(45);
 
 		displayObject.addChild(test);
 		displayObject.setX(150);
+		displayObject.setRotation(30);
 
 		stage.addChild(displayObject);
 

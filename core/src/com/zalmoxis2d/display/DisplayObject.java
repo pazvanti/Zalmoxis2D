@@ -19,6 +19,8 @@ public class DisplayObject extends EventDispatcher {
     private List<DisplayObject> children = new ArrayList<>();
     private Sprite sprite = null;
     private float alpha = 1;
+    private float rotation;
+    private Vector2 rotationOrigin = new Vector2(0, 0);
 
     public void setSprite(Sprite sprite) {
         this.sprite = sprite;
@@ -61,6 +63,29 @@ public class DisplayObject extends EventDispatcher {
 
     public float getY() {
         return this.coordinates.y;
+    }
+
+    public float getRotation() {
+        return this.rotation;
+    }
+
+    public void setRotation(float rotation) {
+        this.rotation = rotation;
+        if (this.sprite != null) {
+            this.sprite.setRotation(rotation);
+        }
+
+        for (DisplayObject child:children) {
+            child.setRotation(rotation);
+        }
+    }
+
+    public Vector2 getRotationOrigin() {
+        return rotationOrigin;
+    }
+
+    public void setRotationOrigin(Vector2 rotationOrigin) {
+        this.rotation = rotation;
     }
 
     public float getWidth() {

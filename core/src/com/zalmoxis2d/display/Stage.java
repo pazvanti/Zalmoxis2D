@@ -13,7 +13,7 @@ import com.zalmoxis2d.event.events.TouchEvent;
 
 import java.util.Set;
 
-public class Stage implements Screen, InputProcessor {
+public class Stage extends EventDispatcher implements Screen, InputProcessor {
     private SpriteBatch spriteBatch;
     private DisplayObject mainDisplayObject;
 
