@@ -43,6 +43,8 @@ public class Zalmoxis2D extends ApplicationAdapter {
 		displayObject.setX(150);
 		displayObject.setRotation(30);
 
+		displayObject.setWidth(20);
+
 		stage.addChild(displayObject);
 
 		TextField textField = new TextField("Test Text\ntt");

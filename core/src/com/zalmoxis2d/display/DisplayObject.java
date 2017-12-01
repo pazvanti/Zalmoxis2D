@@ -14,7 +14,7 @@ public class DisplayObject extends EventDispatcher {
     protected Vector2 globalCoordinates = new Vector2(0, 0);
     protected Vector2 globalRotationOrigin = new Vector2(0, 0);
     protected Vector2 rotationOrigin = new Vector2(0, 0);
-    protected BoundingBox boundingBox = null;
+    protected Rectangle boundingBox = null;
     protected Sprite sprite = null;
     protected float alpha = 1;
     protected float rotation = 0;
@@ -99,11 +99,24 @@ public class DisplayObject extends EventDispatcher {
         return this.boundingBox.getWidth();
     }
 
+    public void setWidth(int width) {
+        if (this.sprite != null) {
+            this.sprite.setSize(width, this.sprite.getHeight());
+        }
+    }
+
     public float getHeight() {
         if (boundingBox == null) {
             calculateBoundingBox();
         }
         return boundingBox.getHeight();
+    }
+
+    public void setHeight(int height) {
+
+        if (this.sprite != null) {
+            this.sprite.setSize(this.sprite.getWidth(), height);
+        }
     }
 
     public void setAlpha(float alpha) {
@@ -181,7 +194,7 @@ public class DisplayObject extends EventDispatcher {
         this.recalculationsNeeded = false;
     }
 
-    public BoundingBox getBounds() {
+    public Rectangle getBounds() {
         if (boundingBox == null) {
             calculateBoundingBox();
         }
@@ -194,11 +207,11 @@ public class DisplayObject extends EventDispatcher {
 
     public boolean touched(Vector2 touchPoint, boolean includeBlankArea) {
         if (includeBlankArea) {
-            BoundingBox boundingBox = this.getBounds();
+            Rectangle boundingRectangle = this.getBounds();
             Rectangle rectangle = new Rectangle(this.globalCoordinates.x,
                     this.globalCoordinates.y,
-                    boundingBox.getWidth(),
-                    boundingBox.getHeight());
+                    boundingRectangle.getWidth(),
+                    boundingRectangle.getHeight());
             return rectangle.contains(touchPoint);
         } else {
             boolean touched = false;
@@ -216,15 +229,14 @@ public class DisplayObject extends EventDispatcher {
     }
 
     protected void calculateBoundingBox() {
-        this.boundingBox = new BoundingBox();
+        this.boundingBox = new Rectangle();
         if (this.sprite != null) {
             Rectangle rectangle = this.sprite.getBoundingRectangle();
-            BoundingBox spriteBB = new BoundingBox(new Vector3(rectangle.x, rectangle.y, 0), new Vector3(rectangle.width, rectangle.height, 0));
-            this.boundingBox.ext(spriteBB);
+            this.boundingBox.merge(rectangle);
         }
 
         for (DisplayObject child:this.children) {
-            this.boundingBox.ext(child.getBounds());
+            this.boundingBox.merge(child.getBounds());
         }
     }
 }

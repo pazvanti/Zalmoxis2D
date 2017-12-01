@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.collision.BoundingBox;
 import com.zalmoxis2d.display.DisplayObject;
 
@@ -76,7 +77,7 @@ public class TextField extends DisplayObject {
 
     @Override
     public void render(SpriteBatch spriteBatch) {
-        BoundingBox boundingBox = this.getBounds();
+        Rectangle boundingBox = this.getBounds();
         font.draw(spriteBatch, this.text, this.globalCoordinates.x, this.globalCoordinates.y + boundingBox.getHeight());
     }
 
@@ -97,8 +98,8 @@ public class TextField extends DisplayObject {
 
     @Override
     protected void calculateBoundingBox() {
-        this.boundingBox = new BoundingBox();
+        this.boundingBox = new Rectangle();
         GlyphLayout layout = new GlyphLayout(font, text);
-        this.boundingBox.ext(layout.width, layout.height, 0);
+        this.boundingBox.merge(layout.width, layout.height);
     }
 }
