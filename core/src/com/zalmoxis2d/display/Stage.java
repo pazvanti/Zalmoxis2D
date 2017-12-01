@@ -5,6 +5,7 @@ import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.math.Vector2;
 import com.zalmoxis2d.event.EventDispatcher;
 import com.zalmoxis2d.event.EventHandler;
 import com.zalmoxis2d.event.events.KeyEvent;
@@ -13,7 +14,7 @@ import com.zalmoxis2d.event.events.TouchEvent;
 
 import java.util.Set;
 
-public class Stage extends EventDispatcher implements Screen, InputProcessor {
+public class Stage implements Screen, InputProcessor {
     private SpriteBatch spriteBatch;
     private DisplayObject mainDisplayObject;
 
@@ -97,7 +98,6 @@ public class Stage extends EventDispatcher implements Screen, InputProcessor {
 
     @Override
     public void render(float delta) {
-
     }
 
     @Override
@@ -122,7 +122,7 @@ public class Stage extends EventDispatcher implements Screen, InputProcessor {
 
     @Override
     public void dispose() {
-
+        this.mainDisplayObject.dispose();
     }
 
     private void triggerStageEvent(String eventType) {
@@ -148,17 +148,19 @@ public class Stage extends EventDispatcher implements Screen, InputProcessor {
         Set<EventDispatcher> itemsWithEvent = getItemsWithEvent(type);
         if (itemsWithEvent == null || itemsWithEvent.isEmpty()) return false;
 
-        float dist = Float.MAX_VALUE;
-        float depth2D = Float.MAX_VALUE;
         EventDispatcher eventDispatcherTriggered = null;
         for(EventDispatcher eventDispatcher:itemsWithEvent) {
             if (eventDispatcher instanceof DisplayObject) {
                 DisplayObject displayObject = (DisplayObject)eventDispatcher;
+                if (displayObject.touched(new Vector2(screenX, screenY))) {
+                    eventDispatcherTriggered = eventDispatcher;
+                }
             }
         }
 
         if (eventDispatcherTriggered != null) {
             eventDispatcherTriggered.dispatchEvents(type, new TouchEvent(button, screenX, screenY, type));
+            return true;
         }
 
         return false;

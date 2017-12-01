@@ -8,6 +8,9 @@ import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.zalmoxis2d.display.DisplayObject;
 import com.zalmoxis2d.display.Stage;
+import com.zalmoxis2d.event.IEventFunction;
+import com.zalmoxis2d.event.events.Event;
+import com.zalmoxis2d.event.events.TouchEvent;
 import com.zalmoxis2d.text.TextField;
 
 public class Zalmoxis2D extends ApplicationAdapter {
@@ -47,6 +50,15 @@ public class Zalmoxis2D extends ApplicationAdapter {
 
 		System.out.println("Text dimensions: " + textField.getWidth() + " -- " + textField.getHeight());
 		System.out.println("DO dimensions: " + displayObject.getWidth() + " -- " + displayObject.getHeight());
+
+		displayObject.addEventListener(TouchEvent.TOUCH_DOWN, new IEventFunction() {
+			@Override
+			public void dispatch(Event event) {
+				System.out.println("Touched");
+			}
+		});
+
+		Gdx.input.setInputProcessor(stage);
 	}
 
 	@Override
@@ -57,6 +69,7 @@ public class Zalmoxis2D extends ApplicationAdapter {
 	@Override
 	public void dispose () {
 		batch.dispose();
+		stage.dispose();
 		img.dispose();
 	}
 }

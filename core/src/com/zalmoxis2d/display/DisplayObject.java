@@ -188,6 +188,33 @@ public class DisplayObject extends EventDispatcher {
         return this.boundingBox;
     }
 
+    public boolean touched(Vector2 touchPoint) {
+        return touched(touchPoint, true);
+    }
+
+    public boolean touched(Vector2 touchPoint, boolean includeBlankArea) {
+        if (includeBlankArea) {
+            BoundingBox boundingBox = this.getBounds();
+            Rectangle rectangle = new Rectangle(this.globalCoordinates.x,
+                    this.globalCoordinates.y,
+                    boundingBox.getWidth(),
+                    boundingBox.getHeight());
+            return rectangle.contains(touchPoint);
+        } else {
+            boolean touched = false;
+            if (this.sprite != null) {
+                touched = this.sprite.getBoundingRectangle().contains(touchPoint);
+            }
+            if (!touched) {
+                for (DisplayObject child:this.children) {
+                    if (touched) break;
+                    touched = child.touched(touchPoint, includeBlankArea);
+                }
+            }
+            return touched;
+        }
+    }
+
     protected void calculateBoundingBox() {
         this.boundingBox = new BoundingBox();
         if (this.sprite != null) {
