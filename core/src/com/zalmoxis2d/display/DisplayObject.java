@@ -12,24 +12,33 @@ import java.util.List;
 
 public class DisplayObject extends EventDispatcher {
     protected Vector2 globalCoordinates = new Vector2(0, 0);
+    protected Vector2 globalRotationOrigin = new Vector2(0, 0);
+    protected Vector2 rotationOrigin = new Vector2(0, 0);
     protected BoundingBox boundingBox = null;
+    protected Sprite sprite = null;
+    protected float alpha = 1;
+    protected float rotation = 0;
+    protected float globalRotation = 0;
+    protected boolean recalculationsNeeded = false;
 
     private Vector2 coordinates = new Vector2(0, 0);
     private DisplayObject parent = null;
     private List<DisplayObject> children = new ArrayList<>();
-    private Sprite sprite = null;
-    private float alpha = 1;
-    private float rotation;
-    private Vector2 rotationOrigin = new Vector2(0, 0);
+
+    public String name;
+    public String toString() {
+        return this.name;
+    }
 
     public void setSprite(Sprite sprite) {
         this.sprite = sprite;
+        recalculationsNeeded = true;
     }
 
     public void addChild(DisplayObject child) {
         this.children.add(0, child);
         child.parent = this;
-        child.calculateGlobalCoordinates();
+        recalculationsNeeded = true;
         this.boundingBox = null;
     }
 
@@ -49,7 +58,7 @@ public class DisplayObject extends EventDispatcher {
 
     public void setX(float x) {
         this.coordinates.x = x;
-        calculateGlobalCoordinates();
+        recalculationsNeeded = true;
     }
 
     public float getX() {
@@ -58,7 +67,7 @@ public class DisplayObject extends EventDispatcher {
 
     public void setY(float y) {
         this.coordinates.y = y;
-        calculateGlobalCoordinates();
+        recalculationsNeeded = true;
     }
 
     public float getY() {
@@ -71,13 +80,7 @@ public class DisplayObject extends EventDispatcher {
 
     public void setRotation(float rotation) {
         this.rotation = rotation;
-        if (this.sprite != null) {
-            this.sprite.setRotation(rotation);
-        }
-
-        for (DisplayObject child:children) {
-            child.setRotation(rotation);
-        }
+        recalculationsNeeded = true;
     }
 
     public Vector2 getRotationOrigin() {
@@ -85,7 +88,8 @@ public class DisplayObject extends EventDispatcher {
     }
 
     public void setRotationOrigin(Vector2 rotationOrigin) {
-        this.rotation = rotation;
+        this.rotationOrigin = rotationOrigin;
+        recalculationsNeeded = true;
     }
 
     public float getWidth() {
@@ -137,6 +141,9 @@ public class DisplayObject extends EventDispatcher {
     }
 
     protected void render(SpriteBatch spriteBatch) {
+        if (recalculationsNeeded) {
+            calculateAndApplyGlobals();
+        }
         if (this.sprite != null) {
             sprite.draw(spriteBatch);
         }
@@ -146,20 +153,32 @@ public class DisplayObject extends EventDispatcher {
         }
     }
 
-    protected void calculateGlobalCoordinates() {
-        if (this.parent == null) return;
-
-        this.globalCoordinates.x = this.coordinates.x + this.parent.globalCoordinates.x;
-        this.globalCoordinates.y = this.coordinates.y + this.parent.globalCoordinates.y;
+    private void calculateAndApplyGlobals() {
+        if (this.parent == null) {
+            this.globalCoordinates.x = this.coordinates.x;
+            this.globalCoordinates.y = this.coordinates.y;
+            this.globalRotation = this.rotation;
+            this.globalRotationOrigin = this.rotationOrigin;
+        } else {
+            this.globalCoordinates.x = this.coordinates.x + this.parent.globalCoordinates.x;
+            this.globalCoordinates.y = this.coordinates.y + this.parent.globalCoordinates.y;
+            this.globalRotation = this.rotation + this.parent.globalRotation;
+            this.globalRotationOrigin.x = this.rotationOrigin.x + this.parent.globalRotationOrigin.x - this.coordinates.x;
+            this.globalRotationOrigin.y = this.rotationOrigin.y + this.parent.globalRotationOrigin.y - this.coordinates.y;
+        }
 
         if (this.sprite != null) {
             this.sprite.setX(this.globalCoordinates.x);
             this.sprite.setY(this.globalCoordinates.y);
+            //this.sprite.setOrigin(this.rotationOrigin.x, this.rotationOrigin.y);
+            this.sprite.setRotation(this.rotation);
         }
 
-        for (DisplayObject child:this.children) {
-            child.calculateGlobalCoordinates();
+        for (DisplayObject child:children) {
+            child.calculateAndApplyGlobals();
         }
+
+        this.recalculationsNeeded = false;
     }
 
     public BoundingBox getBounds() {

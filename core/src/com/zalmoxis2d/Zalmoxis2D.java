@@ -23,11 +23,13 @@ public class Zalmoxis2D extends ApplicationAdapter {
 		img = new Texture("badlogic.jpg");
 		this.stage = Stage.getInstance();
 		displayObject = new DisplayObject();
+		displayObject.name = "displayObject";
 		displayObject.setSprite(new Sprite(img));
 
 		this.stage.init();
 
 		DisplayObject test = new DisplayObject();
+		test.name = "test";
 		test.setSprite(new Sprite(img));
 		test.setX(400);
 		test.setY(100);
