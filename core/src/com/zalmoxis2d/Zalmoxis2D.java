@@ -42,7 +42,7 @@ public class Zalmoxis2D extends ApplicationAdapter {
 
 		stage.addChild(displayObject);
 
-		TextField textField = new TextField("Test Text");
+		TextField textField = new TextField("Test Text\ntt");
 		stage.addChild(textField);
 
 		System.out.println("Text dimensions: " + textField.getWidth() + " -- " + textField.getHeight());
