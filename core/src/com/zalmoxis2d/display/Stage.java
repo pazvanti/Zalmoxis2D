@@ -68,12 +68,16 @@ public class Stage implements Screen, InputProcessor {
 
     @Override
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
-        return touchEvent(screenX, screenY, pointer, button, TouchEvent.TOUCH_DOWN);
+        Vector2 screenTouchPoints = new Vector2(screenX, screenY);
+        screenTouchPoints = screenCoordsToStageCoords(screenTouchPoints);
+        return touchEvent((int)screenTouchPoints.x, (int)screenTouchPoints.y, pointer, button, TouchEvent.TOUCH_DOWN);
     }
 
     @Override
     public boolean touchUp(int screenX, int screenY, int pointer, int button) {
-        return touchEvent(screenX, screenY, pointer, button, TouchEvent.TOUCH_UP);
+        Vector2 screenTouchPoints = new Vector2(screenX, screenY);
+        screenTouchPoints = screenCoordsToStageCoords(screenTouchPoints);
+        return touchEvent((int)screenTouchPoints.x, (int)screenTouchPoints.y, pointer, button, TouchEvent.TOUCH_UP);
     }
 
     @Override
@@ -171,5 +175,11 @@ public class Stage implements Screen, InputProcessor {
         Set<EventDispatcher> itemsWithEvent = eventHandler.getItemsTriggered(eventType);
         if (itemsWithEvent == null || itemsWithEvent.isEmpty()) return null;
         return itemsWithEvent;
+    }
+
+    private Vector2 screenCoordsToStageCoords(Vector2 screenCords) {
+        int height = Gdx.graphics.getHeight();
+        screenCords.y = height - screenCords.y;
+        return screenCords;
     }
 }
