@@ -1,12 +1,16 @@
 package com.zalmoxis2d.display;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.Pixmap;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.math.Vector3;
-import com.badlogic.gdx.math.collision.BoundingBox;
 import com.zalmoxis2d.event.EventDispatcher;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,10 +28,18 @@ public class DisplayObject extends EventDispatcher {
     private Vector2 coordinates = new Vector2(0, 0);
     private DisplayObject parent = null;
     private List<DisplayObject> children = new ArrayList<>();
+    private SpriteBatch spriteBatch = new SpriteBatch();
+    private FrameBuffer fbo;
+    private boolean fboValid = false;
 
     public String name;
     public String toString() {
         return this.name;
+    }
+
+    public DisplayObject() {
+        fbo = FrameBuffer.createFrameBuffer(Pixmap.Format.RGBA8888, 300, 150, false);
+        fbo.getColorBufferTexture().setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
     }
 
     public void setSprite(Sprite sprite) {
@@ -154,16 +166,28 @@ public class DisplayObject extends EventDispatcher {
     }
 
     protected void render(SpriteBatch spriteBatch) {
-        if (recalculationsNeeded) {
-            calculateAndApplyGlobals();
-        }
-        if (this.sprite != null) {
-            sprite.draw(spriteBatch);
-        }
+        if (!fboValid) {
+            fbo.begin();
+            Gdx.gl.glClearColor(1, 1, 1, 1);
+            Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+            /*if (recalculationsNeeded) {
+                This may not be needed if we render each child in the sprite batch of it's parent and do the transformations properly
+                calculateAndApplyGlobals();
+            }*/
 
-        for (DisplayObject child:this.children) {
-            child.render(spriteBatch);
+            this.spriteBatch.begin();
+            if (this.sprite != null) {
+                this.spriteBatch.draw(sprite.getTexture(), 0, 0);
+            }
+
+            for (DisplayObject child : this.children) {
+                child.render(this.spriteBatch);
+            }
+            this.spriteBatch.end();
+            fbo.end();
+            fboValid = true;
         }
+        spriteBatch.draw(fbo.getColorBufferTexture(), this.getX(), this.getY());
     }
 
     private void calculateAndApplyGlobals() {

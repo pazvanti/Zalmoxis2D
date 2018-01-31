@@ -82,7 +82,9 @@ public class Stage implements Screen, InputProcessor {
 
     @Override
     public boolean touchDragged(int screenX, int screenY, int pointer) {
-        return false;
+        Vector2 screenTouchPoints = new Vector2(screenX, screenY);
+        screenTouchPoints = screenCoordsToStageCoords(screenTouchPoints);
+        return touchEvent((int)screenTouchPoints.x, (int)screenTouchPoints.y, pointer, 1, TouchEvent.MOUSE_MOVED);
     }
 
     @Override
